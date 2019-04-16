@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- classpath 是指什么呢 -->
+    <context:property-placeholder location="classpath:db.properties" />
+    <!-- 使用annotation -->
+    <context:annotation-config/>
+    <!-- 使用annotation自动注册bean,并检查@Controller, @Service, @Repository注解已被注入 -->
+    <context:component-scan base-package="com.min.action"/>
+    <context:component-scan base-package="com.min.service"/>
+    <context:component-scan base-package="com.min.dao" />
+    <context:component-scan base-package="com.min.entity" />
+
+    <bean class="org.apache.solr.client.solrj.impl.HttpSolrClient" id="httpSolrClientNews">
+        <constructor-arg name="builder" value="http://223.3.93.101:8983/solr/real-news">
+        </constructor-arg>
+    </bean>
+
+    <context:component-scan base-package="com.min.springDataConfig"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${database.driverClassName}"></property>
+        <property name="jdbcUrl" value="${database.url}"></property>
+        <property name="user" value="${database.username}"></property>
+        <property name="password" value="${database.password}"></property>
+        <property name="maxPoolSize">
+            <value>50</value>
+        </property>
+        <property name="minPoolSize">
+            <value>5</value>
+        </property>
+        <property name="initialPoolSize">
+            <value>5</value>
+        </property>
+        <property name="maxIdleTime">
+            <value>20</value>
+        </property>
+        <property name="maxStatements">
+            <value>50</value>
+        </property>
+        <property name="acquireIncrement">
+            <value>20</value>
+        </property>
+    </bean>
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource">
+            <ref bean="dataSource"></ref>
+        </property>
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="javax.persistence.validation.mode">none</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.autoReconnect">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <!-- 解决session关闭问题 -->
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+                <prop key="current_session_context_class">thread</prop>
+
+                <prop key="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</prop>
+                <prop key="hibernate.max_fetch_depth">3</prop>
+                <prop key="hibernate.connection.url">jdbc:mysql://223.3.93.101:3306/news</prop>
+                <prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop>
+            </props>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>com.min.entity</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    <!-- 定义consumer的参数 -->
+    <bean id="consumerProperties" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="bootstrap.servers" value="223.3.93.101:9092"/>
+                <entry key="group.id" value="0"/>
+                <entry key="enable.auto.commit" value="true"/>
+                <entry key="auto.commit.interval.ms" value="1000"/>
+                <entry key="session.timeout.ms" value="15000"/>
+                <entry key="key.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+                <entry key="value.deserializer" value="org.apache.kafka.common.serialization.StringDeserializer"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- 创建consumerFactory bean -->
+    <bean id="consumerFactory" class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
+        <constructor-arg>
+            <ref bean="consumerProperties"/>
+        </constructor-arg>
+    </bean>
+
+    <!-- 实际执行消息消费的类 -->
+    <bean id="messageListernerConsumerService" class="com.min.service.UpdateService"/>
+
+    <!-- 消费者容器配置信息 -->
+    <bean id="containerProperties" class="org.springframework.kafka.listener.config.ContainerProperties">
+        <constructor-arg value="new-docId-input"/>
+        <property name="messageListener" ref="messageListernerConsumerService"/>
+    </bean>
+
+    <!-- 创建kafkatemplate bean，使用的时候，只需要注入这个bean，即可使用template的send消息方法 -->
+    <bean id="messageListenerContainer" class="org.springframework.kafka.listener.KafkaMessageListenerContainer" init-method="doStart">
+        <constructor-arg ref="consumerFactory"/>
+        <constructor-arg ref="containerProperties"/>
+    </bean>
+
+
+</beans>

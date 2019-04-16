@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+        <constant name="struts.devMode" value="false"/>
+        <constant name="struts.objectFactory" value="spring" />
+        <constant name="struts.ui.theme" value="simple"/>
+
+        <package name="news" namespace="/" extends="json-default">
+            <action name="news" class="com.min.action.LoadIndexAction">
+                <result name="success" type="json">
+                    <param name="root"></param>
+                </result>
+            </action>
+            <action name="news_eventline" class="com.min.action.LoadEventLineAction">
+                <result name="success" type="json">
+                    <param name="root"></param>
+                </result>
+            </action>
+            <action name="news_event" class="com.min.action.LoadEventAction">
+                <result name="success" type="json">
+                    <param name="root"></param>
+                </result>
+            </action>
+            <action name="search" class="com.min.action.SearchAction">
+                <result name="success" type="json">
+                    <param name="root"></param>
+                </result>
+            </action>
+        </package>
+
+</struts>

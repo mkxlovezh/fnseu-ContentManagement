@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="news@223.3.93.101">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.4">
+    <root id="1"/>
+    <schema id="2" parent="1" name="news">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <schema id="3" parent="1" name="information_schema"/>
+    <schema id="4" parent="1" name="mysql"/>
+    <schema id="5" parent="1" name="performance_schema"/>
+    <schema id="6" parent="1" name="ssd"/>
+    <table id="7" parent="2" name="eventlines"/>
+    <table id="8" parent="2" name="events"/>
+    <table id="9" parent="2" name="news"/>
+    <table id="10" parent="2" name="news_events"/>
+    <view id="11" parent="2" name="news_events_eventlines">
+      <Comment>VIEW</Comment>
+    </view>
+    <column id="12" parent="7" name="id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="13" parent="7" name="keywords">
+      <Position>2</Position>
+      <DataType>text|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="14" parent="7" name="entities">
+      <Position>3</Position>
+      <DataType>text|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="15" parent="7" name="event_num">
+      <Position>4</Position>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="16" parent="7" name="doc_num">
+      <Position>5</Position>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <key id="17" parent="7" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="18" parent="8" name="id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="19" parent="8" name="keywords">
+      <Position>2</Position>
+      <DataType>text|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="20" parent="8" name="entities">
+      <Position>3</Position>
+      <DataType>text|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="21" parent="8" name="doc_num">
+      <Position>4</Position>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="22" parent="8" name="time">
+      <Position>5</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <column id="23" parent="8" name="eventline">
+      <Position>6</Position>
+      <DataType>char(36)|0</DataType>
+    </column>
+    <index id="24" parent="8" name="eventline">
+      <ColNames>eventline</ColNames>
+    </index>
+    <key id="25" parent="8" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="26" parent="8" name="events_ibfk_1">
+      <ColNames>eventline</ColNames>
+      <RefSchemaName>news</RefSchemaName>
+      <RefTableName>eventlines</RefTableName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <column id="27" parent="9" name="id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="28" parent="9" name="url">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="29" parent="9" name="title">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="30" parent="9" name="content">
+      <Position>4</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <column id="31" parent="9" name="time">
+      <Position>5</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <index id="32" parent="9" name="url">
+      <ColNames>url</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="33" parent="9" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="34" parent="9" name="url">
+      <ColNames>url</ColNames>
+      <UnderlyingIndexName>url</UnderlyingIndexName>
+    </key>
+    <column id="35" parent="10" name="news_id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="36" parent="10" name="event_id">
+      <Position>2</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <index id="37" parent="10" name="fk_event_id">
+      <ColNames>event_id</ColNames>
+    </index>
+    <key id="38" parent="10" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>news_id
+event_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="39" parent="10" name="fk_news_id">
+      <ColNames>news_id</ColNames>
+      <RefSchemaName>news</RefSchemaName>
+      <RefTableName>news</RefTableName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <foreign-key id="40" parent="10" name="fk_event_id">
+      <ColNames>event_id</ColNames>
+      <RefSchemaName>news</RefSchemaName>
+      <RefTableName>events</RefTableName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <column id="41" parent="11" name="news_id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="42" parent="11" name="event_id">
+      <Position>2</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="43" parent="11" name="eventline_id">
+      <Position>3</Position>
+      <DataType>char(36)|0</DataType>
+    </column>
+    <column id="44" parent="11" name="time">
+      <Position>4</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+  </database-model>
+</dataSource>
